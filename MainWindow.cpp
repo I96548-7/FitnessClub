@@ -10,81 +10,85 @@
 // Общий стиль для всего приложения
 static const QString MAIN_STYLE =
 "QMainWindow { background-color: #E8F5E9; }"
-"QWidget { background-color: #E8F5E9; font-family: 'Segoe UI', 'Arial'; font-size: 14px; }"
-"QGroupBox { font-weight: bold; font-size: 16px; border: 2px solid #A5D6A7; border-radius: 8px; margin-top: 12px; padding-top: 10px; background-color: #F1F8E9; }"
-"QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; color: #2E7D32; font-size: 15px; }"
-"QLabel { color: #1B5E20; font-size: 14px; }"
-"QLineEdit { border: 2px solid #A5D6A7; border-radius: 6px; padding: 8px; background-color: white; color: #1B5E20; selection-background-color: #66BB6A; font-size: 14px; }"
+"QWidget { background-color: #E8F5E9; font-family: 'Segoe UI', 'Arial'; font-size: 16px; }"
+"QGroupBox { font-weight: bold; font-size: 18px; border: 2px solid #A5D6A7; border-radius: 8px; margin-top: 15px; padding-top: 12px; background-color: #F1F8E9; }"
+"QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; color: #2E7D32; font-size: 17px; }"
+"QLabel { color: #1B5E20; font-size: 16px; }"
+"QLineEdit { border: 2px solid #A5D6A7; border-radius: 6px; padding: 10px; background-color: white; color: #1B5E20; selection-background-color: #66BB6A; font-size: 16px; }"
 "QLineEdit:focus { border-color: #4CAF50; }"
-"QTextEdit { border: 2px solid #A5D6A7; border-radius: 8px; background-color: #FFFFFF; color: #2E3B2E; font-family: 'Courier New', monospace; font-size: 13px; }"
-"QListWidget { border: 2px solid #A5D6A7; border-radius: 8px; background-color: white; color: #1B5E20; outline: none; font-size: 14px; }"
-"QListWidget::item { padding: 10px; border-bottom: 1px solid #E8F5E9; }"
+"QTextEdit { border: 2px solid #A5D6A7; border-radius: 8px; background-color: #FFFFFF; color: #2E3B2E; font-family: 'Courier New', monospace; font-size: 15px; }"
+"QListWidget { border: 2px solid #A5D6A7; border-radius: 8px; background-color: white; color: #1B5E20; outline: none; font-size: 16px; }"
+"QListWidget::item { padding: 12px; border-bottom: 1px solid #E8F5E9; }"
 "QListWidget::item:selected { background-color: #C8E6C9; color: #1B5E20; }"
 "QListWidget::item:hover { background-color: #E8F5E9; }"
-"QPushButton { background-color: #4CAF50; color: white; border: none; border-radius: 6px; padding: 10px 18px; font-weight: bold; font-size: 14px; }"
+"QPushButton { background-color: #4CAF50; color: white; border: none; border-radius: 8px; padding: 12px 20px; font-weight: bold; font-size: 16px; }"
 "QPushButton:hover { background-color: #388E3C; }"
 "QPushButton:pressed { background-color: #2E7D32; }"
-"QPushButton#logoutBtn { background-color: #E53935; font-size: 14px; }"
+"QPushButton#logoutBtn { background-color: #E53935; font-size: 16px; }"
 "QPushButton#logoutBtn:hover { background-color: #C62828; }"
-"QPushButton#loginBtn { background-color: #43A047; font-size: 16px; padding: 12px 28px; }"
-"QComboBox { border: 2px solid #A5D6A7; border-radius: 6px; padding: 8px; background-color: white; color: #1B5E20; font-size: 14px; }"
+"QPushButton#loginBtn { background-color: #43A047; font-size: 18px; padding: 14px 32px; }"
+"QComboBox { border: 2px solid #A5D6A7; border-radius: 6px; padding: 10px; background-color: white; color: #1B5E20; font-size: 16px; }"
 "QComboBox:drop-down { border: none; }"
-"QComboBox::down-arrow { image: none; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #4CAF50; margin-right: 5px; }"
-"QComboBox QAbstractItemView { border: 2px solid #A5D6A7; background-color: white; selection-background-color: #C8E6C9; font-size: 14px; }"
-"QScrollBar:vertical { border: none; background: #E8F5E9; width: 12px; margin: 0; }"
-"QScrollBar::handle:vertical { background: #A5D6A7; border-radius: 6px; min-height: 20px; }"
+"QComboBox::down-arrow { image: none; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #4CAF50; margin-right: 8px; }"
+"QComboBox QAbstractItemView { border: 2px solid #A5D6A7; background-color: white; selection-background-color: #C8E6C9; font-size: 16px; }"
+"QScrollBar:vertical { border: none; background: #E8F5E9; width: 14px; margin: 0; }"
+"QScrollBar::handle:vertical { background: #A5D6A7; border-radius: 7px; min-height: 30px; }"
 "QScrollBar::handle:vertical:hover { background: #81C784; }"
 "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { border: none; background: none; }";
 
 // Стиль для заголовка
 static const QString TITLE_STYLE =
-"font-size: 32px; font-weight: bold; color: #2E7D32; padding: 20px;"
-"background-color: #C8E6C9; border-radius: 12px; margin: 10px;";
-
+"font-size: 38px; font-weight: bold; color: #2E7D32; padding: 25px;"
+"background-color: #C8E6C9; border-radius: 15px; margin: 15px;";
 StatsDialog::StatsDialog(FitnessClubSystem* system, QWidget* parent)
     : QDialog(parent)
     , m_system(system)
 {
     setWindowTitle("Статистика использования ресурсов");
-    setMinimumSize(700, 600);
+    setMinimumSize(800, 700);
     setStyleSheet("QDialog { background-color: #E8F5E9; }"
-        "QLabel { color: #2E7D32; font-weight: bold; font-size: 15px; }"
-        "QPushButton { background-color: #4CAF50; color: white; border-radius: 6px; padding: 8px 16px; font-size: 14px; }"
+        "QLabel { color: #2E7D32; font-weight: bold; font-size: 18px; }"
+        "QPushButton { background-color: #4CAF50; color: white; border-radius: 8px; padding: 10px 20px; font-size: 16px; }"
         "QPushButton:hover { background-color: #388E3C; }"
-        "QComboBox { border: 2px solid #A5D6A7; border-radius: 6px; padding: 8px; background-color: white; font-size: 14px; }"
-        "QTextEdit { border: 2px solid #A5D6A7; border-radius: 8px; background-color: white; font-family: 'Courier New'; font-size: 13px; }");
+        "QComboBox { border: 2px solid #A5D6A7; border-radius: 6px; padding: 10px; background-color: white; font-size: 16px; }"
+        "QTextEdit { border: 2px solid #A5D6A7; border-radius: 8px; background-color: white; font-family: 'Courier New'; font-size: 16px; font-weight: bold; }");
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(20);
 
     // Выпадающий список для выбора типа статистики
     QHBoxLayout* selectorLayout = new QHBoxLayout();
+    selectorLayout->setSpacing(15);
+
     QLabel* label = new QLabel("Тип статистики:");
-    label->setStyleSheet("font-size: 16px; font-weight: bold;");
+    label->setStyleSheet("font-size: 18px; font-weight: bold;");
+
     m_statsTypeCombo = new QComboBox();
     m_statsTypeCombo->addItem("📊 Загрузка шкафчиков");
     m_statsTypeCombo->addItem("📦 Статистика по инвентарю");
     m_statsTypeCombo->addItem("🏢 Загрузка залов");
+    m_statsTypeCombo->setStyleSheet("font-size: 16px; padding: 8px;");
 
     m_refreshBtn = new QPushButton("🔄 Обновить");
-    m_refreshBtn->setStyleSheet("QPushButton { background-color: #66BB6A; font-size: 14px; } QPushButton:hover { background-color: #4CAF50; }");
+    m_refreshBtn->setStyleSheet("QPushButton { background-color: #66BB6A; font-size: 16px; padding: 10px 20px; } QPushButton:hover { background-color: #4CAF50; }");
 
     selectorLayout->addWidget(label);
     selectorLayout->addWidget(m_statsTypeCombo);
     selectorLayout->addWidget(m_refreshBtn);
     selectorLayout->addStretch();
 
-    // Область для вывода статистики
+    // Область для вывода статистики - ЖИРНЫЙ ШРИФТ
     m_statsDisplay = new QTextEdit();
     m_statsDisplay->setReadOnly(true);
     m_statsDisplay->setFontFamily("Courier New");
-    m_statsDisplay->setStyleSheet("QTextEdit { font-size: 14px; background-color: #FAFFFA; }");
+    m_statsDisplay->setStyleSheet("QTextEdit { font-size: 16px; font-weight: bold; background-color: #FAFFFA; padding: 15px; }");
 
     mainLayout->addLayout(selectorLayout);
     mainLayout->addWidget(m_statsDisplay);
 
     // Кнопка закрытия
     QPushButton* closeBtn = new QPushButton("✖ Закрыть");
-    closeBtn->setStyleSheet("QPushButton { background-color: #E53935; font-size: 14px; } QPushButton:hover { background-color: #C62828; }");
+    closeBtn->setStyleSheet("QPushButton { background-color: #E53935; font-size: 16px; padding: 10px 20px; } QPushButton:hover { background-color: #C62828; }");
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
     mainLayout->addWidget(closeBtn);
 
@@ -96,7 +100,6 @@ StatsDialog::StatsDialog(FitnessClubSystem* system, QWidget* parent)
     // Загружаем статистику по умолчанию
     updateStats();
 }
-
 void StatsDialog::onStatsTypeChanged(int index)
 {
     updateStats();

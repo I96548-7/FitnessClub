@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QDate>
 #include <QTime>
+#include <QDateTime>
 
 FitnessClubSystem::FitnessClubSystem()
     : currentUser(nullptr)
@@ -442,7 +443,7 @@ QString FitnessClubSystem::adminBuyMembership()
     QString nfc = QInputDialog::getText(nullptr, "Новый клиент", "NFC-метка:", QLineEdit::Normal, "", &ok);
     if (!ok || nfc.isEmpty()) return "Операция отменена";
 
-    int newId = 200;
+    int newId = 100;
     while (repo.FindUser(newId)) newId++;
 
     Client c;
@@ -634,8 +635,21 @@ QString FitnessClubSystem::trainerBookHall()
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime().addSecs(3600);
     QString dateTimeStr = QInputDialog::getText(nullptr, "Бронирование зала",
-        "Дата и время (ГГГГ-ММ-ДД ЧЧ:ММ):", QLineEdit::Normal, date.toString("yyyy-MM-dd") + " " + time.toString("hh:mm"), &ok);
+        "Дата и время (ГГГГ-ММ-ДД ЧЧ:ММ):", QLineEdit::Normal,
+        date.toString("yyyy-MM-dd") + " " + time.toString("hh:mm"), &ok);
     if (!ok || dateTimeStr.isEmpty()) return "Операция отменена";
+
+    // ПРОВЕРКА: нельзя бронировать на прошедшую дату/время
+    QDateTime selectedDateTime = QDateTime::fromString(dateTimeStr, "yyyy-MM-dd hh:mm");
+    if (!selectedDateTime.isValid()) {
+        return "✗ Неверный формат даты и времени! Используйте ГГГГ-ММ-ДД ЧЧ:ММ";
+    }
+
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    if (selectedDateTime <= currentDateTime) {
+        return "✗ Нельзя забронировать зал на прошедшее или текущее время!\n"
+            "   Пожалуйста, выберите будущую дату и время.";
+    }
 
     int dur = QInputDialog::getInt(nullptr, "Бронирование зала",
         "Длительность (часы):", 1, 1, 8, 1, &ok);
@@ -645,8 +659,23 @@ QString FitnessClubSystem::trainerBookHall()
         "Макс. участников:", 10, 1, hall->Capacity, 1, &ok);
     if (!ok) return "Операция отменена";
 
+    // ПРОВЕРКА: нельзя бронировать зал, если уже есть занятие в это время
+    time_t startTime = selectedDateTime.toSecsSinceEpoch();
+    time_t endTime = startTime + dur * 3600;
+
+    for (auto& existing : repo.Schedule) {
+        if (existing.HallId == hall->Id) {
+            // Проверяем пересечение интервалов
+            if (!(endTime <= existing.StartTime || startTime >= existing.EndTime)) {
+                return "✗ Зал уже забронирован на это время!\n"
+                    "   Выберите другое время или дату.";
+            }
+        }
+    }
+
     struct tm tm = { 0 };
-    sscanf(dateTimeStr.toStdString().c_str(), "%d-%d-%d %d:%d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min);
+    sscanf(dateTimeStr.toStdString().c_str(), "%d-%d-%d %d:%d",
+        &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min);
     tm.tm_year -= 1900;
     tm.tm_mon -= 1;
     time_t start = mktime(&tm);
@@ -662,7 +691,12 @@ QString FitnessClubSystem::trainerBookHall()
     s.MaxClients = maxc;
     repo.Schedule.push_back(s);
 
-    return "✓ Зал '" + QString::fromStdString(hall->Name) + "' забронирован!\n✓ Тренировка '" + activity + "' добавлена в расписание!";
+    repo.SaveChanges();
+
+    return "✓ Зал '" + QString::fromStdString(hall->Name) + "' забронирован!\n"
+        "✓ Тренировка '" + activity + "' добавлена в расписание!\n"
+        "  Дата и время: " + dateTimeStr + "\n"
+        "  Длительность: " + QString::number(dur) + " час(ов)";
 }
 
 QString FitnessClubSystem::trainerShowMyTrainings()
