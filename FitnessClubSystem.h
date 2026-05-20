@@ -18,10 +18,6 @@ public:
     QString getCurrentUserRole();
     void logout();
 
-    QString executeClientCommand(int command);
-    QString executeAdminCommand(int command);
-    QString executeTrainerCommand(int command);
-
     // Публичные методы для прямого вызова из MainWindow
     Client* getClient();
 
@@ -46,7 +42,6 @@ public:
     QString adminReturnEquipment();    // Админ принудительно возвращает инвентарь
     QString showClientsWithDebts();    // Показать клиентов с невозвращенными ресурсами
     QString adminBuyMembership();
-    QString adminShowStats();
     QString adminReleaseHall();
     QString showLockerStats();      // Статистика загрузки шкафчиков
     QString showEquipmentStats();   // Статистика по инвентарю  

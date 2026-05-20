@@ -455,43 +455,6 @@ QString FitnessClubSystem::adminBuyMembership()
     return "✓ Абонемент оформлен! ID: " + QString::number(newId) + ", NFC: " + nfc;
 }
 
-QString FitnessClubSystem::adminShowStats()
-{
-    updateCompletedBookings();
-    std::stringstream ss;
-
-    int occupied = 0;
-    for (auto& l : repo.Lockers) if (l.Status == LockerStatus::Occupied) occupied++;
-
-    int available = 0;
-    for (auto& e : repo.EquipmentList) if (e.Status == EquipmentStatus::Available) available++;
-
-    int booked = 0;
-    for (auto& h : repo.Halls) if (h.Status == HallStatus::Booked) booked++;
-
-    int completed = 0, cancelled = 0, active = 0;
-    for (auto& b : repo.Bookings) {
-        if (b.Status == BookingStatus::Completed) completed++;
-        else if (b.Status == BookingStatus::Cancelled) cancelled++;
-        else active++;
-    }
-
-    ss << "\n========== СТАТИСТИКА ==========\n";
-    ss << "Клиентов: " << repo.Clients.size() << "\n";
-    ss << "Тренеров: " << repo.Trainers.size() << "\n";
-    ss << "Шкафчики: " << occupied << "/" << repo.Lockers.size() << " занято\n";
-    ss << "Инвентарь: " << available << "/" << repo.EquipmentList.size() << " доступно\n";
-    ss << "Залы: " << booked << "/" << repo.Halls.size() << " занято\n";
-    ss << "Бронирования: " << active << " активных, " << completed << " завершенных, " << cancelled << " отмененных\n";
-    ss << "=================================\n";
-
-    if (repo.Schedule.empty()) {
-        ss << "\nСовет: Тренер должен войти в систему и забронировать зал (пункт 1)\n";
-    }
-
-    return QString::fromStdString(ss.str());
-}
-
 QString FitnessClubSystem::adminReleaseHall()
 {
     for (auto& h : repo.Halls) {

@@ -14,8 +14,8 @@
 using namespace std;
 
 enum class LockerStatus { Free, Occupied };
-enum class EquipmentStatus { Available, CheckedOut, UnderRepair, WrittenOff };
-enum class HallStatus { Free, Booked, UnderMaintenance };
+enum class EquipmentStatus { Available, CheckedOut};
+enum class HallStatus { Free, Booked};
 enum class BookingStatus { Confirmed, Cancelled, Completed };
 enum class UserType { Client, Administrator, Trainer };
 
@@ -32,30 +32,24 @@ inline LockerStatus stringToLockerStatus(const string& str) {
 inline string equipmentStatusToString(EquipmentStatus status) {
     switch (status) {
     case EquipmentStatus::CheckedOut: return "CheckedOut";
-    case EquipmentStatus::UnderRepair: return "UnderRepair";
-    case EquipmentStatus::WrittenOff: return "WrittenOff";
     default: return "Available";
     }
 }
 
 inline EquipmentStatus stringToEquipmentStatus(const string& str) {
     if (str == "CheckedOut") return EquipmentStatus::CheckedOut;
-    if (str == "UnderRepair") return EquipmentStatus::UnderRepair;
-    if (str == "WrittenOff") return EquipmentStatus::WrittenOff;
     return EquipmentStatus::Available;
 }
 
 inline string hallStatusToString(HallStatus status) {
     switch (status) {
     case HallStatus::Booked: return "Booked";
-    case HallStatus::UnderMaintenance: return "UnderMaintenance";
     default: return "Free";
     }
 }
 
 inline HallStatus stringToHallStatus(const string& str) {
     if (str == "Booked") return HallStatus::Booked;
-    if (str == "UnderMaintenance") return HallStatus::UnderMaintenance;
     return HallStatus::Free;
 }
 
