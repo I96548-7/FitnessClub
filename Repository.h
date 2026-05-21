@@ -167,95 +167,184 @@ public:
     }
 
     void LoadAllFromFile() {
+        // Пробуем открыть файл
         ifstream file("database.txt");
         if (!file.is_open()) {
             cout << "ERROR: database.txt not found!" << endl;
             return;
         }
 
-        string line, section;
+        // Очищаем существующие данные
+        Clients.clear();
+        Admins.clear();
+        Trainers.clear();
+        Lockers.clear();
+        EquipmentList.clear();
+        Halls.clear();
+
+        string line;
+        string currentSection = "";
+        int lineNum = 0;
+
+        // Вспомогательная лямбда-функция для удаления пробелов и символов возврата каретки
+        auto clean = [](string& s) {
+            // Удаляем \r
+            if (!s.empty() && s.back() == '\r') {
+                s.pop_back();
+            }
+            // Удаляем пробелы в начале и конце
+            size_t start = s.find_first_not_of(" \t");
+            size_t end = s.find_last_not_of(" \t");
+            if (start == string::npos) {
+                s = "";
+            }
+            else {
+                s = s.substr(start, end - start + 1);
+            }
+            };
+
+        // Вспомогательная лямбда-функция для split по разделителю
+        auto split = [](const string& str, char delimiter) -> vector<string> {
+            vector<string> result;
+            stringstream ss(str);
+            string item;
+            while (getline(ss, item, delimiter)) {
+                // Очищаем каждый элемент от пробелов
+                size_t start = item.find_first_not_of(" \t");
+                size_t end = item.find_last_not_of(" \t");
+                if (start != string::npos) {
+                    item = item.substr(start, end - start + 1);
+                }
+                result.push_back(item);
+            }
+            return result;
+            };
+
         while (getline(file, line)) {
-            line = Trim(line);
+            lineNum++;
+            clean(line);
+
+            // Пропускаем пустые строки и комментарии
             if (line.empty()) continue;
-            if (line[0] == '[') {
-                section = line;
-                cout << "Reading section: " << section << endl;
+            if (line[0] == '#') continue;
+            if (line[0] == '/' && line[1] == '/') continue;
+
+            // Проверка на секцию
+            if (line[0] == '[' && line.back() == ']') {
+                currentSection = line;
+                cout << "Reading section: " << currentSection << " (line " << lineNum << ")" << endl;
                 continue;
             }
 
-            stringstream ss(line);
+            // Если нет активной секции, пропускаем
+            if (currentSection.empty()) continue;
 
-            if (section == "[CLIENTS]") {
-                Client c;
-                string idStr, membership, nfc;
-                if (getline(ss, idStr, '|') && getline(ss, c.Name, '|') &&
-                    getline(ss, membership, '|') && getline(ss, nfc, '|')) {
-                    c.Id = stoi(idStr);
-                    c.MembershipType = membership;
-                    c.NfcTag = nfc;
+            // Разбиваем строку на части
+            vector<string> parts = split(line, '|');
+
+            // Обработка секций
+            if (currentSection == "[CLIENTS]") {
+                if (parts.size() >= 4) {
+                    Client c;
+                    c.Id = stoi(parts[0]);
+                    c.Name = parts[1];
+                    c.MembershipType = parts[2];
+                    c.NfcTag = parts[3];
                     Clients.push_back(c);
                     cout << "  Loaded client: " << c.Id << "|" << c.Name << endl;
                 }
+                else {
+                    cout << "  WARNING: Invalid client line: " << line << endl;
+                }
             }
-            else if (section == "[ADMINS]") {
-                Administrator a;
-                string idStr;
-                if (getline(ss, idStr, '|') && getline(ss, a.Name, '|')) {
-                    a.Id = stoi(idStr);
+            else if (currentSection == "[ADMINS]") {
+                if (parts.size() >= 2) {
+                    Administrator a;
+                    a.Id = stoi(parts[0]);
+                    a.Name = parts[1];
                     Admins.push_back(a);
                     cout << "  Loaded admin: " << a.Id << "|" << a.Name << endl;
                 }
+                else {
+                    cout << "  WARNING: Invalid admin line: " << line << endl;
+                }
             }
-            else if (section == "[TRAINERS]") {
-                Trainer t;
-                string idStr, spec;
-                if (getline(ss, idStr, '|') && getline(ss, t.Name, '|') && getline(ss, spec, '|')) {
-                    t.Id = stoi(idStr);
-                    t.Specialization = spec;
+            else if (currentSection == "[TRAINERS]") {
+                if (parts.size() >= 3) {
+                    Trainer t;
+                    t.Id = stoi(parts[0]);
+                    t.Name = parts[1];
+                    t.Specialization = parts[2];
                     Trainers.push_back(t);
                     cout << "  Loaded trainer: " << t.Id << "|" << t.Name << endl;
                 }
+                else {
+                    cout << "  WARNING: Invalid trainer line: " << line << endl;
+                }
             }
-            else if (section == "[LOCKERS]") {
-                Locker l;
-                string idStr, status, clientIdStr;
-                if (getline(ss, idStr, '|') && getline(ss, status, '|') && getline(ss, clientIdStr, '|')) {
-                    l.Id = stoi(idStr);
-                    l.Status = stringToLockerStatus(status);
-                    l.AssignedToClientId = stoi(clientIdStr);
+            else if (currentSection == "[LOCKERS]") {
+                if (parts.size() >= 3) {
+                    Locker l;
+                    l.Id = stoi(parts[0]);
+                    l.Status = (parts[1] == "Occupied" || parts[1] == "occupied") ? LockerStatus::Occupied : LockerStatus::Free;
+                    l.AssignedToClientId = stoi(parts[2]);
                     Lockers.push_back(l);
-                    cout << "  Loaded locker: " << l.Id << "|" << status << endl;
+                    cout << "  Loaded locker: " << l.Id << "|" << parts[1] << endl;
+                }
+                else {
+                    cout << "  WARNING: Invalid locker line: " << line << endl;
                 }
             }
-            else if (section == "[EQUIPMENT]") {
-                Equipment e;
-                string idStr, name, status, clientIdStr;
-                if (getline(ss, idStr, '|') && getline(ss, name, '|') &&
-                    getline(ss, status, '|') && getline(ss, clientIdStr, '|')) {
-                    e.Id = stoi(idStr);
-                    e.Name = name;
-                    e.Status = stringToEquipmentStatus(status);
-                    e.CheckedOutToClientId = stoi(clientIdStr);
+            else if (currentSection == "[EQUIPMENT]") {
+                if (parts.size() >= 4) {
+                    Equipment e;
+                    e.Id = stoi(parts[0]);
+                    e.Name = parts[1];
+
+                    string status = parts[2];
+                    if (status == "CheckedOut" || status == "checkedout") {
+                        e.Status = EquipmentStatus::CheckedOut;
+                    }
+                    else {
+                        e.Status = EquipmentStatus::Available;
+                    }
+
+                    e.CheckedOutToClientId = stoi(parts[3]);
                     EquipmentList.push_back(e);
-                    cout << "  Loaded equipment: " << e.Id << "|" << name << "|" << status << endl;
+                    cout << "  Loaded equipment: " << e.Id << "|" << e.Name << "|" << parts[2] << endl;
+                }
+                else {
+                    cout << "  WARNING: Invalid equipment line: " << line << endl;
                 }
             }
-            else if (section == "[HALLS]") {
-                Hall h;
-                string idStr, name, capacity, status;
-                if (getline(ss, idStr, '|') && getline(ss, name, '|') &&
-                    getline(ss, capacity, '|') && getline(ss, status, '|')) {
-                    h.Id = stoi(idStr);
-                    h.Name = name;
-                    h.Capacity = stoi(capacity);
-                    h.Status = stringToHallStatus(status);
+            else if (currentSection == "[HALLS]") {
+                if (parts.size() >= 4) {
+                    Hall h;
+                    h.Id = stoi(parts[0]);
+                    h.Name = parts[1];
+                    h.Capacity = stoi(parts[2]);
+
+                    string status = parts[3];
+                    if (status == "Booked" || status == "booked") {
+                        h.Status = HallStatus::Booked;
+                    }
+                    else {
+                        h.Status = HallStatus::Free;
+                    }
+
                     Halls.push_back(h);
-                    cout << "  Loaded hall: " << h.Id << "|" << name << "|" << status << endl;
+                    cout << "  Loaded hall: " << h.Id << "|" << h.Name << "|" << parts[3] << endl;
+                }
+                else {
+                    cout << "  WARNING: Invalid hall line: " << line << endl;
                 }
             }
         }
+
         file.close();
 
+
+        // Вывод итогов загрузки
         cout << "\n========================================" << endl;
         cout << "FINAL LOADED DATA:" << endl;
         cout << "  Clients: " << Clients.size() << endl;

@@ -78,7 +78,7 @@ QString FitnessClubSystem::showSchedule()
     ss << "\n=== РАСПИСАНИЕ ===\n";
     if (repo.Schedule.empty()) {
         ss << "  Нет занятий\n";
-        ss << "  Тренер может создать занятие (пункт 1 в меню тренера)\n";
+        ss << "  Тренер может создать занятие\n";
         return QString::fromStdString(ss.str());
     }
     for (auto& s : repo.Schedule) {
@@ -458,13 +458,93 @@ QString FitnessClubSystem::adminBuyMembership()
 
 QString FitnessClubSystem::adminReleaseHall()
 {
+    // Собираем список занятых залов
+    QStringList bookedHalls;
+    vector<Hall*> bookedHallsList;
+
     for (auto& h : repo.Halls) {
         if (h.Status == HallStatus::Booked) {
-            h.Release();
-            return "✓ Зал " + QString::fromStdString(h.Name) + " освобожден";
+            bookedHalls << QString("%1 - %2 (вместимость: %3 чел.)")
+                .arg(h.Id)
+                .arg(QString::fromStdString(h.Name))
+                .arg(h.Capacity);
+            bookedHallsList.push_back(&h);
         }
     }
-    return "Нет занятых залов";
+
+    if (bookedHalls.isEmpty()) {
+        return "Нет занятых залов для освобождения";
+    }
+
+    bool ok;
+    QString selected = QInputDialog::getItem(nullptr, "Освобождение зала",
+        "Выберите зал для освобождения:", bookedHalls, 0, false, &ok);
+
+    if (!ok || selected.isEmpty()) {
+        return "Операция отменена";
+    }
+
+    // Находим выбранный зал
+    int hallId = selected.split(" - ")[0].toInt();
+    Hall* selectedHall = nullptr;
+
+    for (auto* h : bookedHallsList) {
+        if (h->Id == hallId) {
+            selectedHall = h;
+            break;
+        }
+    }
+
+    if (!selectedHall) {
+        return "✗ Зал не найден";
+    }
+
+    // Находим и удаляем все тренировки в этом зале
+    int removedCount = 0;
+    auto it = repo.Schedule.begin();
+    while (it != repo.Schedule.end()) {
+        if (it->HallId == selectedHall->Id) {
+            // Удаляем записи клиентов из этой тренировки
+            for (int clientId : it->ClientIds) {
+                Client* c = repo.FindClient(clientId);
+                if (c) {
+                    // Удаляем ID бронирования из списка клиента
+                    auto bookingIt = find(c->BookingIds.begin(), c->BookingIds.end(), it->Id);
+                    if (bookingIt != c->BookingIds.end()) {
+                        c->BookingIds.erase(bookingIt);
+                    }
+                }
+            }
+
+            // Удаляем бронирования из репозитория
+            auto bookingIt = repo.Bookings.begin();
+            while (bookingIt != repo.Bookings.end()) {
+                if (bookingIt->ScheduleId == it->Id) {
+                    bookingIt = repo.Bookings.erase(bookingIt);
+                }
+                else {
+                    ++bookingIt;
+                }
+            }
+
+            it = repo.Schedule.erase(it);
+            removedCount++;
+        }
+        else {
+            ++it;
+        }
+    }
+
+    // Освобождаем зал
+    selectedHall->Release();
+    repo.SaveChanges();
+
+    QString result = "✓ Зал \"" + QString::fromStdString(selectedHall->Name) + "\" освобожден!\n";
+    if (removedCount > 0) {
+        result += "  Удалено тренировок в этом зале: " + QString::number(removedCount);
+    }
+
+    return result;
 }
 // НОВЫЙ МЕТОД - показать клиентов с невозвращенными ресурсами
 QString FitnessClubSystem::showClientsWithDebts()

@@ -56,3 +56,5 @@
 [HALLS]
 1|Yoga Hall|15|Free
 2|Gym|20|Free
+3|Pool|30|Free
+4|Box|10|Free

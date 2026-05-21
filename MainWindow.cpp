@@ -69,8 +69,8 @@ StatsDialog::StatsDialog(FitnessClubSystem* system, QWidget* parent)
     m_statsTypeCombo->addItem("🏢 Загрузка залов");
     m_statsTypeCombo->setStyleSheet("font-size: 16px; padding: 8px;");
 
-    m_refreshBtn = new QPushButton("🔄 Обновить");
-    m_refreshBtn->setStyleSheet("QPushButton { background-color: #66BB6A; font-size: 16px; padding: 10px 20px; } QPushButton:hover { background-color: #4CAF50; }");
+    m_refreshBtn = new QPushButton(" ");
+    m_refreshBtn->setStyleSheet("QPushButton { background-color: #E8F5E9; font-size: 16px; padding: 10px 20px; } QPushButton:hover { background-color: #E8F5E9; }");
 
     selectorLayout->addWidget(label);
     selectorLayout->addWidget(m_statsTypeCombo);
